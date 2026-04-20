@@ -59,7 +59,7 @@ rabbitmq:
       dlx_name: auth.dlx
       dlq_name: auth.dlq
       queues:
-        - name: user.password.updated
+        - name: stack.user.password.updated
           declare: true
           declare_dlx: true
           declare_dlq: true
@@ -67,7 +67,7 @@ rabbitmq:
           delivery_limit: 5
           bindings:
             - password.changed
-        - name: user.created
+        - name: stack.user.created
           declare: true
           declare_dlx: false
           declare_dlq: true
@@ -75,6 +75,21 @@ rabbitmq:
           delivery_limit: 5
           bindings:
             - user.created
+    - name: b2b
+      kind: topic
+      durable: true
+      declare_exchange: true
+      dlx_name: b2b.dlx
+      dlq_name: b2b.dlq
+      queues:
+        - name: stack.b2b.user.deleted
+          declare: true
+          declare_dlx: true
+          declare_dlq: true
+          prefetch: 8
+          delivery_limit: 5
+          bindings:
+            - user.deleted
 ```
 
 ### Dead Letter Exchange (DLX) and Dead Letter Queue (DLQ)
@@ -108,7 +123,7 @@ rabbitmq:
       dlx_name: auth.dlx
       dlq_name: auth.dlq
       queues:
-        - name: user.password.updated
+        - name: stack.user.password.updated
           declare: true
           declare_dlx: true
           declare_dlq: true
@@ -116,7 +131,7 @@ rabbitmq:
           delivery_limit: 5
           bindings:
             - password.changed
-        - name: user.created
+        - name: stack.user.created
           declare: true
           declare_dlx: false
           declare_dlq: true
@@ -191,6 +206,7 @@ Queue names are mapped to handlers in the stack. For example:
 - `user.password.updated` → updates an instance passphrase when a `password.changed` routing key is received.
 - `user.created` → validates and processes user creation events.
 - `user.phone.updated` → updates the phone number stored in user settings.
+- `user.deleted` on the `b2b` exchange → removes externally managed organization contacts.
 
 Message schemas are JSON and validated in the handler. Example payload for `user.password.updated`:
 
@@ -219,9 +235,32 @@ Example payload for `user.created`:
   "publicKey": "base64",
   "privateKey": "cipherString",
   "key": "cipherString",
-  "timestamp": 1726040000
+  "timestamp": 1726040000,
+  "workplaceFqdn": "alice.example.twake.app",
+  "organizationId": "org-uuid-123",
+  "organizationDomain": "example.com",
+  "canUpgrade": false
 }
 ```
+
+
+Example payload for `b2b/user.deleted`:
+
+```json
+{
+  "emitter": "admin-panel",
+  "type": "user.deleted",
+  "workplaceFqdn": "alice.example.twake.app",
+  "internalEmail": "alice@example.com",
+  "reason": "user deleted",
+  "organizationId": "org-uuid-123",
+  "userId": "alice",
+  "domain": "example.com"
+}
+```
+
+The delete handler removes the single matching contact found by `internalEmail`
+when `metadata.external` is true. 
 
 Example payload for `user.phone.updated`:
 
@@ -330,4 +369,3 @@ ch.PublishWithContext(ctx,
     },
 )
 ```
-
