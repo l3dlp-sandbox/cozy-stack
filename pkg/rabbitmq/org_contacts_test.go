@@ -19,8 +19,7 @@ import (
 func TestSyncCreatedOrgContact(t *testing.T) {
 	t.Run("CreatesExternalContactsForOtherMembers", func(t *testing.T) {
 		config.UseTestFile(t)
-		setup := testutils.NewSetup(t, "TestSyncCreatedOrgContactCreatesExternalContactsForOtherMembers")
-		_ = setup.GetTestInstance()
+		testutils.NeedCouchdb(t)
 
 		suffix := fmt.Sprintf("%d", time.Now().UnixNano())
 		orgDomain := "sync-created-" + suffix + ".example"
@@ -82,8 +81,7 @@ func TestSyncCreatedOrgContact(t *testing.T) {
 
 	t.Run("SkipsExistingExternalContact", func(t *testing.T) {
 		config.UseTestFile(t)
-		setup := testutils.NewSetup(t, "TestSyncCreatedOrgContactSkipsExistingExternalContact")
-		_ = setup.GetTestInstance()
+		testutils.NeedCouchdb(t)
 
 		suffix := fmt.Sprintf("%d", time.Now().UnixNano())
 		orgDomain := "sync-created-existing-" + suffix + ".example"
@@ -120,8 +118,7 @@ func TestSyncCreatedOrgContact(t *testing.T) {
 
 	t.Run("FailsOnMultipleExternalContactsForEmail", func(t *testing.T) {
 		config.UseTestFile(t)
-		setup := testutils.NewSetup(t, "TestSyncCreatedOrgContactFailsOnMultipleExternalContactsForEmail")
-		_ = setup.GetTestInstance()
+		testutils.NeedCouchdb(t)
 
 		suffix := fmt.Sprintf("%d", time.Now().UnixNano())
 		orgDomain := "sync-created-dup-" + suffix + ".example"
@@ -143,8 +140,7 @@ func TestSyncCreatedOrgContact(t *testing.T) {
 
 	t.Run("ContinuesAfterInstanceError", func(t *testing.T) {
 		config.UseTestFile(t)
-		setup := testutils.NewSetup(t, "TestSyncCreatedOrgContactContinuesAfterInstanceError")
-		_ = setup.GetTestInstance()
+		testutils.NeedCouchdb(t)
 
 		suffix := fmt.Sprintf("%d", time.Now().UnixNano())
 		orgDomain := "sync-created-continue-" + suffix + ".example"
@@ -173,8 +169,7 @@ func TestSyncCreatedOrgContact(t *testing.T) {
 
 	t.Run("MissingInternalEmail", func(t *testing.T) {
 		config.UseTestFile(t)
-		setup := testutils.NewSetup(t, "TestSyncCreatedOrgContactMissingInternalEmail")
-		_ = setup.GetTestInstance()
+		testutils.NeedCouchdb(t)
 
 		suffix := fmt.Sprintf("%d", time.Now().UnixNano())
 		orgDomain := "sync-created-missing-email-" + suffix + ".example"
@@ -191,8 +186,7 @@ func TestSyncCreatedOrgContact(t *testing.T) {
 
 	t.Run("MissingPublicName", func(t *testing.T) {
 		config.UseTestFile(t)
-		setup := testutils.NewSetup(t, "TestSyncCreatedOrgContactMissingPublicName")
-		_ = setup.GetTestInstance()
+		testutils.NeedCouchdb(t)
 
 		suffix := fmt.Sprintf("%d", time.Now().UnixNano())
 		orgDomain := "sync-created-missing-name-" + suffix + ".example"
@@ -211,8 +205,7 @@ func TestSyncCreatedOrgContact(t *testing.T) {
 
 	t.Run("MissingOrganizationDomain", func(t *testing.T) {
 		config.UseTestFile(t)
-		setup := testutils.NewSetup(t, "TestSyncCreatedOrgContactMissingOrganizationDomain")
-		_ = setup.GetTestInstance()
+		testutils.NeedCouchdb(t)
 
 		suffix := fmt.Sprintf("%d", time.Now().UnixNano())
 		orgDomain := "sync-created-missing-org-" + suffix + ".example"
@@ -229,8 +222,7 @@ func TestSyncCreatedOrgContact(t *testing.T) {
 
 	t.Run("OrganizationHasNoInstances", func(t *testing.T) {
 		config.UseTestFile(t)
-		setup := testutils.NewSetup(t, "TestSyncCreatedOrgContactOrganizationHasNoInstances")
-		_ = setup.GetTestInstance()
+		testutils.NeedCouchdb(t)
 
 		suffix := fmt.Sprintf("%d", time.Now().UnixNano())
 		orgDomain := "sync-created-zero-" + suffix + ".example"
@@ -250,8 +242,7 @@ func TestSyncCreatedOrgContact(t *testing.T) {
 func TestSyncDeletedOrgContact(t *testing.T) {
 	t.Run("DeletesExternalContactsFromOtherMembers", func(t *testing.T) {
 		config.UseTestFile(t)
-		setup := testutils.NewSetup(t, "TestSyncDeletedOrgContactDeletesExternalContactsFromOtherMembers")
-		_ = setup.GetTestInstance()
+		testutils.NeedCouchdb(t)
 
 		suffix := fmt.Sprintf("%d", time.Now().UnixNano())
 		orgDomain := "sync-deleted-" + suffix + ".example"
@@ -294,8 +285,7 @@ func TestSyncDeletedOrgContact(t *testing.T) {
 
 	t.Run("NoExternalContactIsNoOp", func(t *testing.T) {
 		config.UseTestFile(t)
-		setup := testutils.NewSetup(t, "TestSyncDeletedOrgContactNoExternalContactIsNoOp")
-		_ = setup.GetTestInstance()
+		testutils.NeedCouchdb(t)
 
 		suffix := fmt.Sprintf("%d", time.Now().UnixNano())
 		orgDomain := "sync-deleted-noop-" + suffix + ".example"
@@ -321,8 +311,7 @@ func TestSyncDeletedOrgContact(t *testing.T) {
 
 	t.Run("FailsOnMultipleExternalContactsForEmail", func(t *testing.T) {
 		config.UseTestFile(t)
-		setup := testutils.NewSetup(t, "TestSyncDeletedOrgContactFailsOnMultipleExternalContactsForEmail")
-		_ = setup.GetTestInstance()
+		testutils.NeedCouchdb(t)
 
 		suffix := fmt.Sprintf("%d", time.Now().UnixNano())
 		orgDomain := "sync-deleted-dup-" + suffix + ".example"
@@ -344,8 +333,7 @@ func TestSyncDeletedOrgContact(t *testing.T) {
 
 	t.Run("ContinuesAfterInstanceError", func(t *testing.T) {
 		config.UseTestFile(t)
-		setup := testutils.NewSetup(t, "TestSyncDeletedOrgContactContinuesAfterInstanceError")
-		_ = setup.GetTestInstance()
+		testutils.NeedCouchdb(t)
 
 		suffix := fmt.Sprintf("%d", time.Now().UnixNano())
 		orgDomain := "sync-deleted-continue-" + suffix + ".example"
@@ -399,8 +387,7 @@ func TestSyncDeletedOrgContact(t *testing.T) {
 
 	t.Run("OrganizationHasNoInstances", func(t *testing.T) {
 		config.UseTestFile(t)
-		setup := testutils.NewSetup(t, "TestSyncDeletedOrgContactOrganizationHasNoInstances")
-		_ = setup.GetTestInstance()
+		testutils.NeedCouchdb(t)
 
 		suffix := fmt.Sprintf("%d", time.Now().UnixNano())
 		orgDomain := "sync-deleted-zero-" + suffix + ".example"

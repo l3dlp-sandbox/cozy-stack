@@ -346,7 +346,7 @@ func Create(db prefixer.Prefixer, opts CreateOptions) (*Contact, error) {
 	}
 
 	name := strings.TrimSpace(opts.Name)
-	displayName := strings.TrimSpace(opts.Name)
+	displayName := name
 	if name == "" {
 		parts := strings.SplitN(email, "@", 2)
 		name = parts[0]

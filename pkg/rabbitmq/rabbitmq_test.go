@@ -351,6 +351,10 @@ func TestHandlers(t *testing.T) {
 
 		ch, err := getChannel(t, MQ)
 		require.NoError(t, err)
+		waitForDeclaredQueues(t, MQ, queuePassiveCheck{
+			name:         rabbitmq.QueueB2BUserDeleted,
+			dlRoutingKey: rabbitmq.RoutingKeyB2BUserDeleted,
+		})
 
 		msg := rabbitmq.UserDeletedMessage{
 			Emitter:        "admin-panel",
@@ -928,25 +932,29 @@ func getChannel(t *testing.T, mq *testutils.RabbitFixture) (*amqp.Channel, error
 	return ch, err
 }
 
-func waitForDeclaredQueues(t *testing.T, mq *testutils.RabbitFixture, queueNames ...string) {
+type queuePassiveCheck struct {
+	name         string
+	dlRoutingKey string
+}
+
+func waitForDeclaredQueues(t *testing.T, mq *testutils.RabbitFixture, checks ...queuePassiveCheck) {
 	t.Helper()
 
 	testutils.WaitForOrFail(t, 10*time.Second, func() bool {
-		for _, queueName := range queueNames {
-			conn, err := amqp.Dial(mq.AMQPURL)
-			if err != nil {
-				return false
-			}
+		conn, err := amqp.Dial(mq.AMQPURL)
+		if err != nil {
+			return false
+		}
+		defer func() { _ = conn.Close() }()
 
-			ch, err := conn.Channel()
-			if err != nil {
-				_ = conn.Close()
-				return false
-			}
+		ch, err := conn.Channel()
+		if err != nil {
+			return false
+		}
+		defer func() { _ = ch.Close() }()
 
-			_, err = ch.QueueInspect(queueName)
-			_ = ch.Close()
-			_ = conn.Close()
+		for _, check := range checks {
+			_, err = ch.QueueInspect(check.name)
 			if err != nil {
 				return false
 			}
@@ -1074,19 +1082,7 @@ func setUpRabbitMQConfig(t *testing.T, mq *testutils.RabbitFixture, name string)
 		},
 	}
 
-	// Start the stack via testutils and create an instance
 	setup := testutils.NewSetup(t, name)
-	_ = setup.GetTestInstance()
-	waitForDeclaredQueues(t, mq,
-		rabbitmq.QueueUserPasswordUpdated,
-		rabbitmq.QueueUserCreated,
-		rabbitmq.QueueUserPhoneUpdated,
-		rabbitmq.QueueUser2FAUpdated,
-		rabbitmq.QueueUserRecoveryEmailUpdated,
-		rabbitmq.QueueDomainSubscriptionChanged,
-		rabbitmq.QueueB2BUserDeleted,
-		rabbitmq.QueueAppCommands,
-	)
 	return setup
 }
 

@@ -138,7 +138,6 @@ type UserCreatedMessage struct {
 	WorkplaceFqdn      string `json:"workplaceFqdn"` // The fully qualified workplace domain
 	OrganizationID     string `json:"organizationId,omitempty"`
 	OrganizationDomain string `json:"organizationDomain,omitempty"`
-	CanUpgrade         *bool  `json:"canUpgrade,omitempty"`
 }
 
 // Handle processes a user created message.
