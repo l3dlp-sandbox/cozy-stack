@@ -72,10 +72,45 @@ func (s *Sharing) SendInvitations(inst *instance.Instance, perms *permission.Per
 		})
 	}
 	errg := g.Wait()
-	if err := couchdb.UpdateDoc(inst, s); err != nil {
+	if err := s.updateMemberStatusesWithRetry(inst); err != nil {
 		return err
 	}
 	return errg
+}
+
+// updateMemberStatusesWithRetry persists the current member statuses to
+// CouchDB, retrying on conflict. A conflict can happen when ProcessAnswer
+// updates the sharing concurrently (e.g. during auto-accept).
+// On retry, the document is reloaded and statuses are re-applied, but
+// members already in Ready state are never downgraded.
+func (s *Sharing) updateMemberStatusesWithRetry(inst *instance.Instance) error {
+	desiredStatuses := make(map[int]string, len(s.Members))
+	for i, m := range s.Members {
+		if i > 0 {
+			desiredStatuses[i] = m.Status
+		}
+	}
+
+	maxRetries := 3
+	for attempt := 0; ; attempt++ {
+		err := couchdb.UpdateDoc(inst, s)
+		if err == nil || !couchdb.IsConflictError(err) || attempt >= maxRetries {
+			return err
+		}
+		s, err = FindSharing(inst, s.SID)
+		if err != nil {
+			return err
+		}
+		for i, status := range desiredStatuses {
+			if i >= len(s.Members) {
+				continue
+			}
+			if s.Members[i].Status == MemberStatusReady {
+				continue
+			}
+			s.Members[i].Status = status
+		}
+	}
 }
 
 // SendInvitationsToMembers sends mails from a recipient (open_sharing) to
